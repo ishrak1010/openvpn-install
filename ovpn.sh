@@ -56,7 +56,7 @@ newclient () {
 	echo "</key>" >> ~/$1.ovpn
 	echo "<tls-auth>" >> ~/$1.ovpn
 	cat /etc/openvpn/ta.key >> ~/$1.ovpn
-	echo "</tls-auth>" >> ~/$1.ovpn
+	echo "</-auth>" >> ~/$1.ovpn
 }
 
 # Try to get our IP from the system and fallback to the Internet.
