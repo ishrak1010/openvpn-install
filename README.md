@@ -8,6 +8,6 @@ This script will let you setup your own VPN server in no more than a minute, eve
 ### Installation
 Run the script and follow the assistant:
 
-`wget https://raw.githubusercontent.com/ishrak1010/openvpn-installer/master/ovpn.sh && bash ovpn.sh`
+`wget https://github.com/ishrak1010/ovpn-installer/raw/master/ovpn.sh && bash ovpn.sh`
 
 Once it ends, you can run it again to add more users, remove some of them or even completely uninstall OpenVPN.
