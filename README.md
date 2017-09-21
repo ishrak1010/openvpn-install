@@ -1,5 +1,5 @@
 ## openvpn-install
-This is a modified version of Nyr's OpenVPN installer to make it compatible for use with Mikrotik Devices as clients.
+This is a modified version of [Nyr's OpenVPN installer](https://github.com/Nyr/openvpn-install)  to make it compatible for use with Mikrotik Devices as clients.
 
 OpenVPN [road warrior](http://en.wikipedia.org/wiki/Road_warrior_%28computing%29) installer for Debian, Ubuntu and CentOS.
 
