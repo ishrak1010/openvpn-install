@@ -188,13 +188,13 @@ else
 	echo ""
 	echo "Which protocol do you want for OpenVPN connections?"
 	echo "   1) TCP"
-	read -p "Protocol [1-2]: " -e -i 1 PROTOCOL
+	read -p "Protocol: " -e -i 1 PROTOCOL
 	case $PROTOCOL in
 		1) 
 		PROTOCOL=tcp
 		;;
 		2) 
-		PROTOCOL=
+		PROTOCOL=tcp
 		;;
 	esac
 	echo ""
