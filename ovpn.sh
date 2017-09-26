@@ -193,9 +193,6 @@ else
 		1) 
 		PROTOCOL=tcp
 		;;
-		2) 
-		PROTOCOL=tcp
-		;;
 	esac
 	echo ""
 	echo "What port do you want OpenVPN listening to?"
