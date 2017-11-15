@@ -176,6 +176,7 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 	done
 else
 	clear
+	PROTOCOL=tcp
 	echo 'Welcome to this quick OpenVPN "road warrior" installer'
 	echo ""
 	# OpenVPN setup and first user creation
@@ -185,15 +186,6 @@ else
 	echo "First I need to know the IPv4 address of the network interface you want OpenVPN"
 	echo "listening to."
 	read -p "IP address: " -e -i $IP IP
-	echo ""
-	echo "Which protocol do you want for OpenVPN connections?"
-	echo "   1) TCP"
-	read -p "Protocol: " -e -i 1 PROTOCOL
-	case $PROTOCOL in
-		1) 
-		PROTOCOL=tcp
-		;;
-	esac
 	echo ""
 	echo "What port do you want OpenVPN listening to?"
 	read -p "Port: " -e -i 1194 PORT
