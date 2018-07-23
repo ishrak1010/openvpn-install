@@ -180,6 +180,7 @@ else
 	echo "   5) Hurricane Electric"
 	echo "   6) Verisign"
 	echo "   7) Quad9"
+	echo "   8) Cloudflare"
 	read -p "DNS [1-7]: " -e -i 1 DNS
 	echo ""
 	echo "Finally, tell me your name for the client certificate"
@@ -256,6 +257,10 @@ ifconfig-pool-persist ipp.txt" > /etc/openvpn/server.conf
 		;;
 		7) 
 		echo 'push "dhcp-option DNS 9.9.9.9"' >> /etc/openvpn/server.conf
+		;;
+		8) 
+		echo 'push "dhcp-option DNS 1.1.1.1"' >> /etc/openvpn/server.conf
+		echo 'push "dhcp-option DNS 1.0.0.1"' >> /etc/openvpn/server.conf
 		;;
 	esac
 	echo "keepalive 10 120
