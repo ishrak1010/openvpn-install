@@ -63,7 +63,7 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 		echo "   4) Exit"
 		read -p "Select an option [1-4]: " option
 		case $option in
-			1) 
+			1)
 			echo ""
 			echo "Tell me a name for the client certificate"
 			echo "Please, use one word only, no special characters"
@@ -105,31 +105,31 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 			echo "Certificate for client $CLIENT revoked"
 			exit
 			;;
-			3) 
+			3)
 			echo ""
 			read -p "Do you really want to remove OpenVPN? [y/n]: " -e -i n REMOVE
 			if [[ "$REMOVE" = 'y' ]]; then
 				PORT=$(grep '^port ' /etc/openvpn/server.conf | cut -d " " -f 2)
 				PROTOCOL=$(grep '^proto ' /etc/openvpn/server.conf | cut -d " " -f 2)
 				if pgrep firewalld; then
-					IP=$(firewall-cmd --direct --get-rules ipv4 nat POSTROUTING | grep '\-s 10.4.0.0/24 '"'"'!'"'"' -d 10.4.0.0/24 -j SNAT --to ' | cut -d " " -f 10)
+					IP=$(firewall-cmd --direct --get-rules ipv4 nat POSTROUTING | grep '\-s 10.8.0.0/24 '"'"'!'"'"' -d 10.8.0.0/24 -j SNAT --to ' | cut -d " " -f 10)
 					# Using both permanent and not permanent rules to avoid a firewalld reload.
 					firewall-cmd --zone=public --remove-port=$PORT/$PROTOCOL
-					firewall-cmd --zone=trusted --remove-source=10.4.0.0/24
+					firewall-cmd --zone=trusted --remove-source=10.8.0.0/24
 					firewall-cmd --permanent --zone=public --remove-port=$PORT/$PROTOCOL
-					firewall-cmd --permanent --zone=trusted --remove-source=10.4.0.0/24
-					firewall-cmd --direct --remove-rule ipv4 nat POSTROUTING 0 -s 10.4.0.0/24 ! -d 10.4.0.0/24 -j SNAT --to $IP
-					firewall-cmd --permanent --direct --remove-rule ipv4 nat POSTROUTING 0 -s 10.4.0.0/24 ! -d 10.4.0.0/24 -j SNAT --to $IP
+					firewall-cmd --permanent --zone=trusted --remove-source=10.8.0.0/24
+					firewall-cmd --direct --remove-rule ipv4 nat POSTROUTING 0 -s 10.8.0.0/24 ! -d 10.8.0.0/24 -j SNAT --to $IP
+					firewall-cmd --permanent --direct --remove-rule ipv4 nat POSTROUTING 0 -s 10.8.0.0/24 ! -d 10.8.0.0/24 -j SNAT --to $IP
 				else
-					IP=$(grep 'iptables -t nat -A POSTROUTING -s 10.4.0.0/24 ! -d 10.4.0.0/24 -j SNAT --to ' $RCLOCAL | cut -d " " -f 14)
-					iptables -t nat -D POSTROUTING -s 10.4.0.0/24 ! -d 10.4.0.0/24 -j SNAT --to $IP
-					sed -i '/iptables -t nat -A POSTROUTING -s 10.4.0.0\/24 ! -d 10.4.0.0\/24 -j SNAT --to /d' $RCLOCAL
+					IP=$(grep 'iptables -t nat -A POSTROUTING -s 10.8.0.0/24 ! -d 10.8.0.0/24 -j SNAT --to ' $RCLOCAL | cut -d " " -f 14)
+					iptables -t nat -D POSTROUTING -s 10.8.0.0/24 ! -d 10.8.0.0/24 -j SNAT --to $IP
+					sed -i '/iptables -t nat -A POSTROUTING -s 10.8.0.0\/24 ! -d 10.8.0.0\/24 -j SNAT --to /d' $RCLOCAL
 					if iptables -L -n | grep -qE '^ACCEPT'; then
 						iptables -D INPUT -p $PROTOCOL --dport $PORT -j ACCEPT
-						iptables -D FORWARD -s 10.4.0.0/24 -j ACCEPT
+						iptables -D FORWARD -s 10.8.0.0/24 -j ACCEPT
 						iptables -D FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
 						sed -i "/iptables -I INPUT -p $PROTOCOL --dport $PORT -j ACCEPT/d" $RCLOCAL
-						sed -i "/iptables -I FORWARD -s 10.4.0.0\/24 -j ACCEPT/d" $RCLOCAL
+						sed -i "/iptables -I FORWARD -s 10.8.0.0\/24 -j ACCEPT/d" $RCLOCAL
 						sed -i "/iptables -I FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT/d" $RCLOCAL
 					fi
 				fi
@@ -226,17 +226,17 @@ key server.key
 dh dh.pem
 auth SHA1
 topology subnet
-server 10.4.0.0 255.255.255.0
+server 10.8.0.0 255.255.255.0
 ifconfig-pool-persist ipp.txt" > /etc/openvpn/server.conf
 	echo 'push "redirect-gateway def1 bypass-dhcp"' >> /etc/openvpn/server.conf
 	# DNS
 	case $DNS in
-		1) 
+		1)
 		grep -v '#' /etc/resolv.conf | grep 'nameserver' | grep -E -o '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | while read line; do
 			echo "push \"dhcp-option DNS $line\"" >> /etc/openvpn/server.conf
 		done
 		;;
-		2) 
+		2)
 		echo 'push "dhcp-option DNS 8.8.8.8"' >> /etc/openvpn/server.conf
 		echo 'push "dhcp-option DNS 8.8.4.4"' >> /etc/openvpn/server.conf
 		;;
@@ -244,21 +244,21 @@ ifconfig-pool-persist ipp.txt" > /etc/openvpn/server.conf
 		echo 'push "dhcp-option DNS 208.67.222.222"' >> /etc/openvpn/server.conf
 		echo 'push "dhcp-option DNS 208.67.220.220"' >> /etc/openvpn/server.conf
 		;;
-		4) 
+		4)
 		echo 'push "dhcp-option DNS 129.250.35.250"' >> /etc/openvpn/server.conf
 		echo 'push "dhcp-option DNS 129.250.35.251"' >> /etc/openvpn/server.conf
 		;;
-		5) 
+		5)
 		echo 'push "dhcp-option DNS 74.82.42.42"' >> /etc/openvpn/server.conf
 		;;
-		6) 
+		6)
 		echo 'push "dhcp-option DNS 64.6.64.6"' >> /etc/openvpn/server.conf
 		echo 'push "dhcp-option DNS 64.6.65.6"' >> /etc/openvpn/server.conf
 		;;
-		7) 
+		7)
 		echo 'push "dhcp-option DNS 9.9.9.9"' >> /etc/openvpn/server.conf
 		;;
-		8) 
+		8)
 		echo 'push "dhcp-option DNS 1.1.1.1"' >> /etc/openvpn/server.conf
 		echo 'push "dhcp-option DNS 1.0.0.1"' >> /etc/openvpn/server.conf
 		;;
@@ -279,25 +279,25 @@ crl-verify crl.pem" >> /etc/openvpn/server.conf
 	echo 1 > /proc/sys/net/ipv4/ip_forward
 	if pgrep firewalld; then
 		firewall-cmd --zone=public --add-port=$PORT/$PROTOCOL
-		firewall-cmd --zone=trusted --add-source=10.4.0.0/24
+		firewall-cmd --zone=trusted --add-source=10.8.0.0/24
 		firewall-cmd --permanent --zone=public --add-port=$PORT/$PROTOCOL
-		firewall-cmd --permanent --zone=trusted --add-source=10.4.0.0/24
-		firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -s 10.4.0.0/24 ! -d 10.4.0.0/24 -j SNAT --to $IP
-		firewall-cmd --permanent --direct --add-rule ipv4 nat POSTROUTING 0 -s 10.4.0.0/24 ! -d 10.4.0.0/24 -j SNAT --to $IP
+		firewall-cmd --permanent --zone=trusted --add-source=10.8.0.0/24
+		firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -s 10.8.0.0/24 ! -d 10.8.0.0/24 -j SNAT --to $IP
+		firewall-cmd --permanent --direct --add-rule ipv4 nat POSTROUTING 0 -s 10.8.0.0/24 ! -d 10.8.0.0/24 -j SNAT --to $IP
 	else
 		if [[ "$OS" = 'debian' && ! -e $RCLOCAL ]]; then
 			echo '#!/bin/sh -e
 exit 0' > $RCLOCAL
 		fi
 		chmod +x $RCLOCAL
-		iptables -t nat -A POSTROUTING -s 10.4.0.0/24 ! -d 10.4.0.0/24 -j SNAT --to $IP
-		sed -i "1 a\iptables -t nat -A POSTROUTING -s 10.4.0.0/24 ! -d 10.4.0.0/24 -j SNAT --to $IP" $RCLOCAL
+		iptables -t nat -A POSTROUTING -s 10.8.0.0/24 ! -d 10.8.0.0/24 -j SNAT --to $IP
+		sed -i "1 a\iptables -t nat -A POSTROUTING -s 10.8.0.0/24 ! -d 10.8.0.0/24 -j SNAT --to $IP" $RCLOCAL
 		if iptables -L -n | grep -qE '^(REJECT|DROP)'; then
 			iptables -I INPUT -p $PROTOCOL --dport $PORT -j ACCEPT
-			iptables -I FORWARD -s 10.4.0.0/24 -j ACCEPT
+			iptables -I FORWARD -s 10.8.0.0/24 -j ACCEPT
 			iptables -I FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
 			sed -i "1 a\iptables -I INPUT -p $PROTOCOL --dport $PORT -j ACCEPT" $RCLOCAL
-			sed -i "1 a\iptables -I FORWARD -s 10.4.0.0/24 -j ACCEPT" $RCLOCAL
+			sed -i "1 a\iptables -I FORWARD -s 10.8.0.0/24 -j ACCEPT" $RCLOCAL
 			sed -i "1 a\iptables -I FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT" $RCLOCAL
 		fi
 	fi
